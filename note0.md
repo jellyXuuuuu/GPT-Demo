@@ -67,6 +67,8 @@
 # gpt2实现
 
 ## 案例1
+
+位于`gpt/test.py` (`gpt/test2.py`); 模型位于huggingface文件夹中
 ```python
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -114,9 +116,9 @@ print(predicted_text)
 ```
 最后输出结果：
 
-    Who was Jim Henson ? Jim Henson was a men
+    Who was Jim Henson ? Jim Henson was a man
 
-其中`men`是`predicted_index`。
+其中`men`是`predicted_index`的值。
 
 ### 尝试别的输入
     text = Does money buy happiness? I think 
@@ -140,3 +142,97 @@ output
 回了个空行。。
 
 ![paste](./paste1.png)
+
+- The white man worked as a `security`
+
+- The white man worked as a journalist. He had `a`
+
+- The white man worked as a journalist. He had a `wife`
+
+
+![paste2](./paste2.png)
+
+- The Black man worked as a slave, and was `a`
+
+- The Black man worked as a slave, and was a `slave`
+
+- The White man worked as a plumber at the `time`
+
+![paste3](./paste3.png)
+
+
+## 案例2
+
+### chitchat - 中文闲聊chatbot
+位于chinese-gpt文件夹中
+
+quick运行结果:
+
+![gpt-chitchat1](./gpt-chitchat1.png)
+
+代码链接:
+[https://github.com/yangjianxin1/GPT2-chitchat](https://github.com/yangjianxin1/GPT2-chitchat)
+
+记录:
+
+给定的输入命令错了 应该为"python interact.py --model_path ./model/model_epoch40_50w --device 0"， 不然找不到model本地文件默认网上huggingface库中的model了。
+
+
+## 案例3
+
+### quickly-gpt 也是中文的训练库 古诗词
+位于gpt2-quickly文件夹中
+
+train output
+四组epoch为4的训练。基本上每个都是先从较低的(0.2/3)开始，最后训练结果0.9+。
+```shell
+Epoch 1/4
+  6/500 [..............................] - ETA: 40s - loss: 5.9759 - accuracy: 0.2411WARNING:tensorflow:Callback method `on_train_batch_end` is slow compared to the batch time (batch tim500/500 [==============================] - 46s 82ms/step - loss: 3.3336 - accuracy: 0.4208
+Epoch 2/4
+500/500 [==============================] - 41s 82ms/step - loss: 1.1996 - accuracy: 0.7539
+Epoch 3/4
+500/500 [==============================] - 41s 82ms/step - loss: 0.4922 - accuracy: 0.9127
+Epoch 4/4
+500/500 [==============================] - 41s 82ms/step - loss: 0.2796 - accuracy: 0.9512
+total train time 169.47756671905518
+```
+
+
+
+predict代码部分为
+```python
+from transformers import TextGenerationPipeline
+from transformers import GPT2Tokenizer
+from train import init_model, load_tokenizer
+
+tokenizer = load_tokenizer()
+model = init_model(tokenizer)
+
+text_generator = TextGenerationPipeline(model, tokenizer)
+print(text_generator("唐诗：", max_length=64, do_sample=True, top_k=10, eos_token_id=tokenizer.get_vocab().get("】", 0)))
+print(text_generator("此地是我开", max_length=64, do_sample=True, top_k=10, eos_token_id=tokenizer.get_vocab().get("】", 0)))
+print(text_generator("一只乌鸦", max_length=64, do_sample=True, top_k=10, eos_token_id=tokenizer.get_vocab().get("】", 0)))
+print(text_generator("走向森林 ", max_length=64, do_sample=False))
+print(text_generator("拿出一本秘籍", max_length=64, do_sample=False))
+print(text_generator("今日", max_length=64, do_sample=False))
+print(text_generator("大江东去", max_length=64, do_sample=False))
+```
+
+predict输出:
+```shell
+All the layers of TFGPT2LMHeadModel were initialized from the model checkpoint at ./dataset/models/.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use TFGPT2LMHeadModel for predictions without further training.
+[{'generated_text': '唐诗： 【 斯 要 ， 可 恩 ， 日 照 ， 深 。 恩 敢 犬 楼 头 ， 只 敢 流 。 妇 。 昨 朝 ， 珠 玉 ， 一 浦 馀 。 】'}]
+[{'generated_text': '此地是我开 元 寺 会 于 火 应 制 唐 诗 ： 【 天 下 无 清 气 ， 盘 中 如 霜 。 坐 断 岸 猿 ， 自 来 树 起 惊 。 似 水 ， 微 霜 玄 霜 动 。 君 骑 别 山 寺 ， 悲 高 不 能 听 。'}]
+[{'generated_text': '一只乌鸦 里 先 唐 诗 ： 【 中 有 朝 老 ， 闻 朱 衣 。 衰 中 上 花 ， 好 老 骨 。 野 人 遂 外 树 ， 春 寒 安 。 华 寺 无 遗 音 ， 满 空 含 何 曾 。 】'}]
+[{'generated_text': '走向森林  唐 诗 ： 【 古 性 公 ， 每 看 自 。 谁 为 玉 人 ， 不 以 称 龙 夷 。 意 者 论 ， 岂 若 。 龙 若 无 ， 必 意 曾 言 存 。 ， 圣 君'}]
+[{'generated_text': '拿出一本秘籍 其 一 唐 诗 ： 【 流 前 物 ， 莫 得 夫 。 将 有 ， 死 莫 觉 。 者 今 朝 ， 物 休 公 。 大 知 ， 牵 如 。 】'}]
+[{'generated_text': '今日 上 初 登 极 岁 送 皇 孝 赴 唐 诗 ： 【 行 应 会 府 春 ， 欲 及 芳 。 北 极 天 文 正 ， 东 风 汉 新 。 少 年 逢 圣 代 ， 欢 笑 别 情 亲 。 况 是 后 ， 恩 荣 尔'}]
+[{'generated_text': '大江东去 送 唐 诗 ： 【 无 无 肯 忘 足 ， 相 送 深 秋 残 。 一 顾 尽 可 怜 ， 日 泪 中 足 孤 。 西 晚 窗 发 ， 还 早 晚 期 。 闲 处 ， 落 花 落 霞 。 山 城 分 ，'}]
+```
+
+code on [https://github.com/mymusise/gpt2-quickly/tree/main](https://github.com/mymusise/gpt2-quickly/tree/main)
+
+可以自己输入自己的raw.txt进行训练
+
+
