@@ -68,6 +68,9 @@
 
 ## 案例1
 
+ | 2023/0809
+ 代码源码来自于文章[https://zhuanlan.zhihu.com/p/608340951](https://zhuanlan.zhihu.com/p/608340951)
+
 位于`gpt/test.py` (`gpt/test2.py`); 模型位于huggingface文件夹中
 ```python
 import torch
@@ -160,6 +163,35 @@ output
 
 ![paste3](./paste3.png)
 
+ | 20230810
+
+```python
+texts = ['Who was Jim Henson ? Jim Henson was a',
+         'Does money buy happiness? I think',
+         'Is world pretty ? World is',
+         'Can you Answer me ?',    
+         'The white man worked as a ',
+         'The white man worked as a journalist. He had',
+         'The white man worked as a journalist. He had a',
+         'The White man worked as a plumber at the',
+         'The Black man worked as a slave, and was',
+         'The Black man worked as a slave, and was a'         
+]
+```
+ ```shell
+Who was Jim Henson? Jim Henson was a man
+Does money buy happiness? I think so
+Is world pretty? World is pretty
+Can you Answer me?
+
+The white man worked as a urn
+The white man worked as a journalist. He had a
+The white man worked as a journalist. He had a wife
+The White man worked as a plumber at the time
+The Black man worked as a slave, and was a
+The Black man worked as a slave, and was a slave
+```
+
 
 ## 案例2
 
@@ -177,6 +209,8 @@ quick运行结果:
 
 给定的输入命令错了 应该为"python interact.py --model_path ./model/model_epoch40_50w --device 0"， 不然找不到model本地文件默认网上huggingface库中的model了。
 
+ | 20230809
+ 模型位于 xy/gpt/chinese-gpt/GPT2-chitchat-master/model/model_epoch40_50w/ 的 pytorch_model.bin, size为329.0mb 
 
 ## 案例3
 
@@ -231,8 +265,48 @@ If your task is similar to the task the model of the checkpoint was trained on, 
 [{'generated_text': '大江东去 送 唐 诗 ： 【 无 无 肯 忘 足 ， 相 送 深 秋 残 。 一 顾 尽 可 怜 ， 日 泪 中 足 孤 。 西 晚 窗 发 ， 还 早 晚 期 。 闲 处 ， 落 花 落 霞 。 山 城 分 ，'}]
 ```
 
+
+
 code on [https://github.com/mymusise/gpt2-quickly/tree/main](https://github.com/mymusise/gpt2-quickly/tree/main)
 
 可以自己输入自己的raw.txt进行训练
+
+
+ - 2023/08/09
+
+ 知乎 [https://zhuanlan.zhihu.com/p/291915401](https://zhuanlan.zhihu.com/p/291915401)
+
+ ```python
+ [{'generated_text': '唐诗： 【 莫 愁 爱 时 ， 心 夜 夜 夜 有 却 然 。 火 凤 ， 高 低 沙 火 。 风 啼 ， 色 ， 龙 。 罗 雁 锦 滴 ， 应 不 亦 。 如 泥 如 新 ， 县 处'}]
+[{'generated_text': '此地是我开 元 寺 寄 于 示 义 唐 诗 ： 【 不 问 新 ， 谁 敢 却 修 落 。 莫 道 非 无 ， 光 常 终 朝 。 绝 此 意 行 ， 类 心 亦 前 。 驱 时 岂 存 自 所 ， 吾 生 。 】'}]
+[{'generated_text': '一只乌鸦 唐 诗 ： 【 对 游 花 ， 岭 高 酒 荐 。 朱 锦 流 ， 交 含 霜 。 蝉 声 含 知 ， 未 。 此 道 闻 ， 先 被 满 地 成 。 】'}]
+[{'generated_text': '走向森林  唐 诗 ： 【 古 性 公 ， 每 看 自 。 谁 为 玉 人 ， 不 以 称 龙 夷 。 意 者 论 ， 岂 若 。 龙 若 无 ， 必 意 曾 言 存 。 ， 圣 君'}]
+[{'generated_text': '拿出一本秘籍 其 一 唐 诗 ： 【 流 前 物 ， 莫 得 夫 。 将 有 ， 死 莫 觉 。 者 今 朝 ， 物 休 公 。 大 知 ， 牵 如 。 】'}]
+[{'generated_text': '今日 上 初 登 极 岁 送 皇 孝 赴 唐 诗 ： 【 行 应 会 府 春 ， 欲 及 芳 。 北 极 天 文 正 ， 东 风 汉 新 。 少 年 逢 圣 代 ， 欢 笑 别 情 亲 。 况 是 后 ， 恩 荣 尔'}]
+[{'generated_text': '大江东去 送 唐 诗 ： 【 无 无 肯 忘 足 ， 相 送 深 秋 残 。 一 顾 尽 可 怜 ， 日 泪 中 足 孤 。 西 晚 窗 发 ， 还 早 晚 期 。 闲 处 ， 落 花 落 霞 。 山 城 分 ，'}]
+
+ ```
+
+ ```python
+ [{'generated_text': '唐诗： 【 绿 翠 ， 出 。 可 向 金 长 凤 ， 乾 无 盈 。 风 忆 抱 ， 鸿 峰 尽 情 方 。 言 石 寒 碧 鹤 乾 ， 才 陵 洲 前'}]
+[{'generated_text': '此地是我开 元 寺 诸 兼 呈 诸 公 访 唐 诗 ： 【 谁 知 国 子 何 况 事 ， 来 空 登 愚 声 微 似 。 雷 雨 吹 转 寒 山 夜 ， 清 疏 山 故 乡 将 半 。 愿 见 尽 不 易 ， 千 树 隔 年 重 门'}]
+[{'generated_text': '一只乌鸦 唐 诗 ： 【 洞 庭 盈 草 ， 晚 阴 阳 盘 。 陆 心 人 不 知 此 之 能 将 天 。 见 海 路 ， 马 向 青 。 诸 郎 ， 深 泉 归 来 向 。 永 为 见 处 师 ， 长 安'}]
+[{'generated_text': '走向森林  唐 诗 ： 【 古 性 公 ， 每 看 自 。 谁 为 玉 人 ， 不 以 称 龙 夷 。 意 者 论 ， 岂 若 。 龙 若 无 ， 必 意 曾 言 存 。 ， 圣 君'}]
+[{'generated_text': '拿出一本秘籍 其 一 唐 诗 ： 【 流 前 物 ， 莫 得 夫 。 将 有 ， 死 莫 觉 。 者 今 朝 ， 物 休 公 。 大 知 ， 牵 如 。 】'}]
+[{'generated_text': '今日 上 初 登 极 岁 送 皇 孝 赴 唐 诗 ： 【 行 应 会 府 春 ， 欲 及 芳 。 北 极 天 文 正 ， 东 风 汉 新 。 少 年 逢 圣 代 ， 欢 笑 别 情 亲 。 况 是 后 ， 恩 荣 尔'}]
+[{'generated_text': '大江东去 送 唐 诗 ： 【 无 无 肯 忘 足 ， 相 送 深 秋 残 。 一 顾 尽 可 怜 ， 日 泪 中 足 孤 。 西 晚 窗 发 ， 还 早 晚 期 。 闲 处 ， 落 花 落 霞 。 山 城 分 ，'}]
+
+ ```
+
+ ```python
+ [{'generated_text': '唐诗： 【 迎 天 称 青 流 高 低 将 受 灵 无 路 ， 中 龙 蛇 为 。 白 云 中 满 陵 ， 海 边 曙 色 沙 天 。 山 水 流 便 不 见 海 ， 京 怜 苍 茫 茫 。 】'}]
+[{'generated_text': '一只乌鸦 唐 诗 ： 【 东 归 来 便 向 天 地 ， 谁 知 沈 师 比 。 白 日 最 怜 存 骨 ， 独 令 轻 声 欲 天 。 尘 中 晚 怨 松 ， 渐 见 雪 霜 齐 青 。 旋 天 地 ，'}]
+
+ ```
+
+```python
+[{'generated_text': '唐诗： 【 太 龙 起 ， 从 待 ， 声 陈 高 双 飞 。 六 日 ， 将 声 复 成 。 流 波 深 ， 。 知 细 云 春 阳 初 ， 终 。 惟 合 分 光 更'}]
+[{'generated_text': '一只乌鸦 唐 诗 ： 【 柳 前 笼 烟 笼 前 树 上 天 不 及 知 。 罗 ， 乱 烟 雨 声 满 风 轻 。 歌 一 为 闻 饮 客 ， 野 早 变 春 台 。 无 能 身 意 无 定 堪 ，'}]
+```
 
 
