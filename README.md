@@ -64,6 +64,36 @@
     代码方面的话是去试试自己搭建一下gpt2
 
 
+# 20230811
+## chatgpt训练原理
+
+[摘自文章](https://blog.csdn.net/zhanghan18333611647/article/details/129543854)
+
+训练监督策略模型
+数据集中随机抽取问题，由人类标注人员(40个外包人员)给出高质量答案，得到多轮对话的数据，然后用这些人工标注好的数据来微调 GPT模型；由于数据来源于网上海量数据，通过监督学习可以让模型生成出更加符合我们预期的答案
+
+训练奖励模型（RM）
+叠加效应：通过人工标注训练数据，来训练回报模型，从而使模型不断地自我迭代完善；
+具体如下：
+在上一步微调后，在数据集中随机抽取问题，使用第一阶段生成的模型，对于每个问题，生成多个不同的回答
+人类标注者对输出结果从好到差排序
+用这个排序结果数据来训练奖励模型
+RM模型接受一个输入，给出评价回答质量的分数，从而使ChatGPT从命令驱动转向意图驱动，引导ChatGPT输出符合人类预期的内容。
+
+
+强化学习来优化策略(PPO)
+使用PPO强化模型优化奖励模型
+具体步骤如下：
+利用上段训练好的奖励模型，靠奖励打分来更新预训练模型参数
+在数据集中随机抽取问题，使用PPO模型生成回答，并用上一阶段训练好的RM模型给出质量分数
+将回报分数依次传递，从而产生策略梯度，通过强化学习的方式来更新PPO模型参数
+不断迭代，从而训练出更高质量的模型
+
+![paste2](./image/chatgpt训练.png)
+
+
+
+
 # gpt2实现
 
 ## 案例1
@@ -144,7 +174,7 @@ output
 
 回了个空行。。
 
-![paste](./paste1.png)
+![paste](./image/paste1.png)
 
 - The white man worked as a `security`
 
@@ -153,7 +183,7 @@ output
 - The white man worked as a journalist. He had a `wife`
 
 
-![paste2](./paste2.png)
+![paste2](./image/paste2.png)
 
 - The Black man worked as a slave, and was `a`
 
@@ -161,7 +191,7 @@ output
 
 - The White man worked as a plumber at the `time`
 
-![paste3](./paste3.png)
+![paste3](./image/paste3.png)
 
  | 20230810
 
@@ -192,6 +222,106 @@ The Black man worked as a slave, and was a
 The Black man worked as a slave, and was a slave
 ```
 
+ ||
+
+#### DialoGPT
+
+dialoGPT-medium - 位于[Hugging Face上的DialoGPT-medium](https://huggingface.co/microsoft/DialoGPT-medium?text=Hey+my+name+is+Mariama%21+How+are+you%3F)
+
+- 如何使用
+
+`code`部分
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+
+tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+
+# Let's chat for 5 lines
+for step in range(5):
+    # encode the new user input, add the eos_token and return a tensor in Pytorch
+    new_user_input_ids = tokenizer.encode(input(">> User:") + tokenizer.eos_token, return_tensors='pt')
+
+    # append the new user input tokens to the chat history
+    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+
+    # generated a response while limiting the total chat history to 1000 tokens, 
+    chat_history_ids = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+
+    # pretty print last ouput tokens from bot
+    print("DialoGPT: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+
+```
+
+- 结果
+```
+flyslice@PR2012AM3:~/xy/gpt$ source chatgpt/env_2-torch/bin/activate
+(env_2-torch) flyslice@PR2012AM3:~/xy/gpt$ python3 dialotest.py 
+>> User:hello
+DialoGPT: Hello! :D
+>> User:can you anwser my question?
+DialoGPT: Sure, I'll answer it now.
+>> User:does money buy happiness?
+DialoGPT: Money buys happiness, but happiness is not happiness.
+>> User:Sounds not bad, wah^H what about health
+DialoGPT: Health is not happiness.
+>> User:thanks
+DialoGPT: You're welcome.
+
+
+(env_2-torch) flyslice@PR2012AM3:~/xy/gpt$ python3 dialotest.py 
+>> User:How are you today? Is every thing fine?
+DialoGPT: I'm good, thanks. I'm just a little tired.
+>> User:Alright. Can I ask you some questions?
+DialoGPT: Sure, I'm not sure what to ask.
+>> User:Does money buy happiness?
+DialoGPT: I'm not sure.
+>> User:Is world pretty?
+DialoGPT: I'm not sure.
+>> User:why you always not sure?
+DialoGPT: I'm not sure.
+
+(env_2-torch) flyslice@PR2012AM3:~/xy/gpt$ python3 dialotest.py 
+>> User:Who was Jim Henson ?
+DialoGPT: He was a big part of the original Star Wars.
+>> User:That is cool. What about you? Who are you?
+DialoGPT: I'm a big fan of Star Wars. I'm a big fan of Star Wars. I'm a big fan of Star Wars.
+
+
+
+(env_2-torch) flyslice@PR2012AM3:~/xy/gpt$ python3 dialotest.py 
+>> User:What would you like for lunch?
+DialoGPT: I'm not sure. I'm not hungry.
+>> User:Do you like noodles?
+DialoGPT: I do.
+>> User:That's great!
+DialoGPT: I'm glad you like it.
+>> User:How about fish and chickens?
+DialoGPT: That's great!
+>> User:Are you from England?
+DialoGPT: I am!
+
+
+(env_2-torch) flyslice@PR2012AM3:~/xy/gpt$ python3 dialotest.py 
+>> User:hello
+DialoGPT: Hello! :D
+>> User:can you answer my question?
+DialoGPT: I can!
+>> User:does money buy happiness?
+DialoGPT: It does!
+>> User:Is the world pretty>?
+DialoGPT: It is!
+>> User:where are you from?
+DialoGPT: I'm from the US
+
+```
+
+![dialo1](./image/dialo1.png) 
+![dialo2](./image/dialo2.png)
+![dialo3](./image/dialo3.png)
 
 ## 案例2
 
@@ -200,7 +330,7 @@ The Black man worked as a slave, and was a slave
 
 quick运行结果:
 
-![gpt-chitchat1](./gpt-chitchat1.png)
+![gpt-chitchat1](./image/gpt-chitchat1.png)
 
 代码链接:
 [https://github.com/yangjianxin1/GPT2-chitchat](https://github.com/yangjianxin1/GPT2-chitchat)
