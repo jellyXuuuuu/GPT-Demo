@@ -65,14 +65,69 @@
 
 
 # 20230811
+ChatGPT 用了`Instruct Learning`和`RLHF`. ([https://zhuanlan.zhihu.com/p/610939923](https://zhuanlan.zhihu.com/p/610939923))
+
+    chatGPT之所以在预训练和fine-tune上基于GPT-3（采用的prompt learning）进行instruction learning，主要有以下考量：
+
+    （1）让模型具有更好地泛化能力；
+
+    （2）使模型生成内容具有更好地偏好，更符合人类需要的答案，这里所谓的需要是指避免一些涉黄、涉暴、涉政等等内容；
+
+    （3）能够使得训练数据更具有多样化；
+
+    （4）可以更加无缝衔接的引入强化学习。
+
+ - prompt learning vs instruct learning
+
+     不同的是Prompt是激发语言模型的补全能力，例如根据上半句生成下半句，或是完形填空等。Instruct是激发语言模型的理解能力，它通过给出更明显的指令，让模型去做出正确的行动。指示学习的优点是它经过多任务的微调后，也能够在其他任务上做zero-shot，而提示学习都是针对一个任务的。泛化能力不如指示学习。
+
+
+GPT-3.5 is an upgraded version of GPT-3 with fewer parameters that includes a fine-tuning process for machine learning algorithms.
+
+GPT-4 is the latest addition to the GPT family with 100 trillion parameters and is more powerful than all the previous versions
+
+
+## human data collection
+(40个外包人员)
+Our aim was to select a group of labelers who were sensitive to the preferences of different demographic groups, and who were good at identifying outputs that were potentially harmful.
+
+## chatgpt训练的特点
+
+1）采用的是单一大模型。在 GPT 模型兴起之前，大多数 AI 模型主要是针对特定应用场景需求进行训练的小模型，存在通用性差、训练数据少、适应范围小的弊端。而我们看到，ChatGPT 虽然在过程中使用了奖励模型等辅助手段，但最终用于实现自然语言理解和生成式功能的主模型只有一个，但却在语义理解、推理、协作等方面表现出了更强能力。因此，ChatGPT 的成功，验证了参数增长、训练数据量增大，对 AI 模型的重要意义。
+
+2）采用的是小样本学习方法。在小样本学习（Few-shot Learning）方法下，AI 预训练模型在不必使用大量标记的训练数据，就可以建立起比较通用的泛化能力。简单来说，小样本学习即是在给定有限信息和较少训练数据的情况下，尝试对总体规律进行理解和预测，这一过程类似于“学习如何去学习”。对于小样本学习在 ChatGPT 中的应用，我们认为，这一方法解决了大模型数据标注工作量巨大的问题，是模型得以迅速迭代的基础。
+
+3）采用人类反馈微调监督学习。ChatGPT 是从 GPT3.5（即 InstructGPT）改进而来的版本，相比于前代，ChatGPT 主要变化在于采用了人类反馈机制，对监督学习过程进行微调。本质上来说，无论是大模型还是小样本学习，解决的目标都是提升训练的效率，但真正令ChatGPT 实现结果准确、合理的关键技术，还是在于加入了人类反馈。据 Long Ouyang等人 2022 年发表的《Training language models to follow instructions with humanfeedback》，InstructGPT 仅用 13 亿个参数就实现了比 1750 亿个参数的 GPT-3 更优的输出解雇，显著提升了真实性、减少了有害信息的输出。
+
+摘自: [https://zhuanlan.zhihu.com/p/615331483](https://zhuanlan.zhihu.com/p/615331483)
+
 ## chatgpt训练原理
+Instruct GPT与GPT-3的主要区别在于加入了RLHF(Reinforcement Learning with Human Feedback)对模型进行精调
+
+ fine-tuning approaches微调过程
+
+  we use reinforcement learning from human feedback (RLHF; Christiano et al., 2017; Stiennon et al., 2020) to fine-tune GPT-3 to follow a broad class of written instructions.
+
+  We call the resulting models InstructGPT.
 
 [摘自文章](https://blog.csdn.net/zhanghan18333611647/article/details/129543854)
 
-训练监督策略模型
-数据集中随机抽取问题，由人类标注人员(40个外包人员)给出高质量答案，得到多轮对话的数据，然后用这些人工标注好的数据来微调 GPT模型；由于数据来源于网上海量数据，通过监督学习可以让模型生成出更加符合我们预期的答案
++ 训练监督策略模型SFT
 
-训练奖励模型（RM）
+数据集中随机抽取问题，由人类标注人员给出高质量答案，得到多轮对话的数据，然后用这些人工标注好的数据来微调 GPT模型；由于数据来源于网上海量数据，通过监督学习可以让模型生成出更加符合我们预期的答案
+
+ trained for 16 epochs, using a cosine learning rate decay, and residual dropout of 0.2.
+
+GPT 3.5本身很难理解人类不同类型指令中蕴含的不同意图，也很难判断生成内容是否是高质量的结果。为了让GPT 3.5初步具备理解指令的意图，首先会在数据集中随机抽取问题，由人类标注人员，给出高质量答案，然后用这些人工标注好的数据来微调`GPT-3.5`模型（获得SFT模型, Supervised Fine-Tuning）。
+
+此时的SFT模型在遵循指令/对话方面已经优于 GPT-3，但不一定符合人类偏好。
+
++ 训练奖励模型（RM）  
+  
+  /FeedMe “feedback made easy”的缩写 - [https://blog.csdn.net/keeppractice/article/details/129973967](https://blog.csdn.net/keeppractice/article/details/129973967)
+
+trained a model to take in a prompt and response, and output a scalar reward.
+
 叠加效应：通过人工标注训练数据，来训练回报模型，从而使模型不断地自我迭代完善；
 具体如下：
 在上一步微调后，在数据集中随机抽取问题，使用第一阶段生成的模型，对于每个问题，生成多个不同的回答
@@ -81,7 +136,8 @@
 RM模型接受一个输入，给出评价回答质量的分数，从而使ChatGPT从命令驱动转向意图驱动，引导ChatGPT输出符合人类预期的内容。
 
 
-强化学习来优化策略(PPO)
+ + 强化学习来优化策略(PPO) + Reinforcement learning (RL)
+
 使用PPO强化模型优化奖励模型
 具体步骤如下：
 利用上段训练好的奖励模型，靠奖励打分来更新预训练模型参数
@@ -89,7 +145,36 @@ RM模型接受一个输入，给出评价回答质量的分数，从而使ChatGP
 将回报分数依次传递，从而产生策略梯度，通过强化学习的方式来更新PPO模型参数
 不断迭代，从而训练出更高质量的模型
 
+    为什么使用PPO方法来更新GPT3呢？实际上是因为有限的Prompt导致的，我们不能够训练无限多的Prompt，类似于强化学习中无限的环境，所以只能够通过新旧模型预测的差别来进行学习速度上的提升
+
 ![paste2](./image/chatgpt训练.png)
+
+![paste2](./image/chatgpt-training-step.png)
+
+A diagram illustrating the three steps of our method: (1) `supervised fine-tuning (SFT)`, (2) `reward model (RM) training`, and (3) `einforcement learning via proximal policy optimization (PPO)` on this reward model. Blue arrows indicate that this data is used to train one of our models. In Step 2, boxes A-D are samples from our models that get ranked by labelers. See Section 3 for more details on our method.
+
+
+    InstructGPT 仅用 13 亿个参数就实现了比 1750 亿个参数的 GPT-3 更优的输出解雇，显著提升了真实性、减少了有害信息的输出
+
+## Reinforcement Learning with Human Feedback (RLHF) 
+论文 Augmenting Reinforcement Learning with Human Feedback
+[https://www.cs.utexas.edu/~ai-lab/pubs/ICML_IL11-knox.pdf](https://www.cs.utexas.edu/~ai-lab/pubs/ICML_IL11-knox.pdf)
+
+![paste](./image/RLHF.png)
+
+
+### TAMER框架
+`Training an Agent Manually via Evaluative Reinforcement`，评估式强化人工训练代理
+
+这里不得不提到TAMER（Training an Agent Manually via Evaluative Reinforcement，评估式强化人工训练代理）这个框架。该框架将人类标记者引入到Agents的学习循环中，可以通过人类向Agents提供奖励反馈（即指导Agents进行训练），从而快速达到训练任务目标。引入人类标记者的主要目的是加快训练速度。尽管强化学习技术在很多领域有突出表现，但是仍然存在着许多不足，例如训练收敛速度慢，训练成本高等特点。特别是现实世界中，许多任务的探索成本或数据获取成本很高。如何加快训练效率，是如今强化学习任务待解决的重要问题之一。而TAMER则可以将人类标记者的知识，以奖励信反馈的形式训练Agent，加快其快速收敛。TAMER不需要标记者具有专业知识或编程技术，语料成本更低。通过TAMER+RL（强化学习），借助人类标记者的反馈，能够增强从马尔可夫决策过程 (MDP) 奖励进行强化学习 (RL) 的过程。
+
+具体实现上，人类标记者扮演对话的用户和人工智能助手，提供对话样本，让模型生成一些回复，然后标记者会对回复选项打分排名，将更好的结果反馈回模型中。Agents同时从两种反馈模式中学习——人类强化和马尔可夫决策过程奖励作为一个整合的系统，通过奖励策略对模型进行微调并持续迭代。在此基础上，ChatGPT 可以比 GPT-3 更好的理解和完成人类语言或指令，模仿人类，提供连贯的有逻辑的文本信息的能力。
+
+![paste](./image/TAMER.jpg)
+
+摘自 文章 ChatGPT发展历程、原理、技术架构详解和产业未来（下） [https://developer.aliyun.com/article/1216720](https://developer.aliyun.com/article/1216720)
+
+
 
 
 
