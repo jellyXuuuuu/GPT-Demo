@@ -3,3 +3,4 @@ model-Chinese/
 *.pptx
 dialogpt/
 .gitignore
+huggingface_gpt2_base.zip
