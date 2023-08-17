@@ -186,7 +186,8 @@ A diagram illustrating the three steps of our method: (1) `supervised fine-tunin
  | 2023/0809
  代码源码来自于文章[https://zhuanlan.zhihu.com/p/608340951](https://zhuanlan.zhihu.com/p/608340951)
 
-位于`gpt/test.py` (`gpt/test2.py`); 模型位于huggingface文件夹中
+位于`gpt/test.py` (`gpt/test2.py`); 模型位于huggingface文件夹中 - `gpt2_base模型` - huggingface_gpt2_base.zip文件
+
 ```python
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
