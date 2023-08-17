@@ -2,7 +2,7 @@
 
 在https://huggingface.co/microsoft/DialoGPT-medium 上下载：
 
-- pytorch_model.bin         (548.1mb smallest version of GPT-2, with 124M parameters.)
+- pytorch_model.bin         (863 MB)
 - config.json
 - tokenizer.json
 - vocab.json
